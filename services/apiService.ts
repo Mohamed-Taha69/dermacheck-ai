@@ -1,0 +1,223 @@
+import { AnalysisResult } from "../types";
+
+// Backend API base URL - update this to match your FastAPI server
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+
+/**
+ * Check if backend is available
+ */
+export const checkBackendConnection = async (): Promise<boolean> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/`, {
+      method: "GET",
+      signal: AbortSignal.timeout(5000), // 5 second timeout
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
+
+export interface ScanResponse {
+  status: string;
+  grade: string;
+  image_url: string;
+  report: {
+    assessment: string;
+    key_features: string[];
+    recommendations: string[];
+  };
+}
+
+export interface HistoryItemResponse {
+  id: string;
+  user_id: string;
+  image_url: string;
+  acne_grade: string;
+  confidence: number;
+  medical_advice: {
+    assessment: string;
+    key_features: string[];
+    recommendations: string[];
+  };
+  created_at: string;
+}
+
+export interface ProfileResponse {
+  id: string;
+  full_name?: string;
+  username?: string;
+  website?: string;
+  email?: string;
+}
+
+/**
+ * Convert backend grade to AnalysisResult format
+ */
+const gradeToLevel = (grade: string): number => {
+  switch (grade) {
+    case "Mild": return 1;
+    case "Moderate": return 2;
+    case "Severe": return 3;
+    case "Very_Severe": return 4;
+    default: return 1;
+  }
+};
+
+const gradeToLevelName = (grade: string): string => {
+  switch (grade) {
+    case "Mild": return "Mild (Comedonal)";
+    case "Moderate": return "Moderate (Papular/Pustular)";
+    case "Severe": return "Severe (Nodulocystic)";
+    case "Very_Severe": return "Very Severe (Conglobata)";
+    default: return "Mild (Comedonal)";
+  }
+};
+
+/**
+ * Scan an image using the FastAPI backend
+ */
+export const scanImage = async (file: File, userId: string): Promise<{ result: AnalysisResult; imageUrl: string }> => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("user_id", userId);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/scan`, {
+      method: "POST",
+      body: formData,
+    });
+
+    // Handle network errors (backend not running, CORS, etc.)
+    if (!response.ok) {
+      let errorMessage = "Failed to connect to the backend server.";
+      
+      // Try to get error message from response
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.status || `Server error: ${response.status} ${response.statusText}`;
+      } catch {
+        // If response is not JSON, use status text
+        if (response.status === 0) {
+          errorMessage = `Cannot connect to backend at ${API_BASE_URL}. Please make sure the FastAPI server is running.`;
+        } else {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    const data: ScanResponse = await response.json();
+
+    if (data.status !== "success") {
+      throw new Error(data.status || "Scan failed");
+    }
+
+    // Convert backend response to AnalysisResult format
+    const result: AnalysisResult = {
+      isAcne: true, // Backend always returns acne grades
+      level: gradeToLevel(data.grade),
+      levelName: gradeToLevelName(data.grade),
+      assessment: data.report.assessment,
+      keyFeatures: data.report.key_features,
+      recommendations: data.report.recommendations,
+      confidenceScore: 0.95, // Backend sets confidence to 0.95
+    };
+
+    return {
+      result,
+      imageUrl: data.image_url,
+    };
+  } catch (error: any) {
+    // Handle network errors (fetch failed, CORS, etc.)
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error(
+        `Cannot connect to backend server at ${API_BASE_URL}. ` +
+        `Please make sure:\n` +
+        `1. The FastAPI backend is running\n` +
+        `2. The backend URL is correct in your .env file\n` +
+        `3. CORS is properly configured on the backend`
+      );
+    }
+    // Re-throw other errors
+    throw error;
+  }
+};
+
+/**
+ * Get user history from backend
+ */
+export const getUserHistory = async (userId: string): Promise<HistoryItemResponse[]> => {
+  const response = await fetch(`${API_BASE_URL}/history/${userId}`);
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: "Failed to fetch history" }));
+    throw new Error(error.message || "Failed to fetch history");
+  }
+
+  const data = await response.json();
+
+  if (data.status !== "success") {
+    throw new Error(data.message || "Failed to fetch history");
+  }
+
+  return data.data || [];
+};
+
+/**
+ * Get user profile from backend
+ */
+export const getUserProfile = async (userId: string): Promise<ProfileResponse | null> => {
+  const response = await fetch(`${API_BASE_URL}/profile/${userId}`);
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: "Failed to fetch profile" }));
+    throw new Error(error.message || "Failed to fetch profile");
+  }
+
+  const data = await response.json();
+
+  if (data.status !== "success") {
+    return null;
+  }
+
+  return data.data || null;
+};
+
+/**
+ * Update user profile
+ */
+export const updateUserProfile = async (
+  userId: string,
+  updates: {
+    full_name?: string;
+    username?: string;
+    website?: string;
+  }
+): Promise<ProfileResponse> => {
+  const response = await fetch(`${API_BASE_URL}/profile/update`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      ...updates,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: "Failed to update profile" }));
+    throw new Error(error.message || "Failed to update profile");
+  }
+
+  const data = await response.json();
+
+  if (data.status !== "success") {
+    throw new Error(data.message || "Failed to update profile");
+  }
+
+  return data.data?.[0] || null;
+};
+
