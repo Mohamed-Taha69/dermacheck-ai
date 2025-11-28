@@ -51,7 +51,13 @@ const Analyzer: React.FC<AnalyzerProps> = ({ onAnalysisComplete }) => {
       // Convert base64 image to File
       const response = await fetch(image);
       const blob = await response.blob();
-      const file = new File([blob], "skin-image.jpg", { type: blob.type });
+      
+      // Generate unique filename with timestamp to prevent overwriting
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substring(2, 9);
+      const fileExtension = blob.type.split('/')[1] || 'jpg';
+      const uniqueFilename = `skin-image-${timestamp}-${randomId}.${fileExtension}`;
+      const file = new File([blob], uniqueFilename, { type: blob.type });
 
       // Get user ID (use email as fallback if id doesn't exist)
       const userId = user.id || user.email;
