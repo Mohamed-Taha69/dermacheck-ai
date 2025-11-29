@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ViewState } from '../types';
 import { Mail, Lock, User, ArrowRight, Loader } from 'lucide-react';
 
 interface AuthFormsProps {
   initialView: 'LOGIN' | 'REGISTER';
-  onSuccess: () => void;
-  onSwitch: (view: ViewState) => void;
 }
 
-const AuthForms: React.FC<AuthFormsProps> = ({ initialView, onSuccess, onSwitch }) => {
-  const [isLogin, setIsLogin] = useState(initialView === 'LOGIN');
+const AuthForms: React.FC<AuthFormsProps> = ({ initialView }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isLogin = location.pathname === '/login' || initialView === 'LOGIN';
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -18,12 +19,6 @@ const AuthForms: React.FC<AuthFormsProps> = ({ initialView, onSuccess, onSwitch 
   const [isLoading, setIsLoading] = useState(false);
   
   const { login, register } = useAuth();
-
-  // Update internal state if prop changes
-  React.useEffect(() => {
-    setIsLogin(initialView === 'LOGIN');
-    setError(null);
-  }, [initialView]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +31,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({ initialView, onSuccess, onSwitch 
         if (!success) {
           setError("Invalid email or password.");
         } else {
-          onSuccess();
+          navigate('/');
         }
       } else {
         if (!name) {
@@ -48,7 +43,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({ initialView, onSuccess, onSwitch 
         if (!result.success) {
           setError(result.error || "Registration failed. Please try again.");
         } else {
-          onSuccess();
+          navigate('/');
         }
       }
     } catch (err: any) {
@@ -148,12 +143,12 @@ const AuthForms: React.FC<AuthFormsProps> = ({ initialView, onSuccess, onSwitch 
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600">
               {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
-              <button
-                onClick={() => onSwitch(isLogin ? 'REGISTER' : 'LOGIN')}
+              <Link
+                to={isLogin ? '/register' : '/login'}
                 className="font-medium text-teal-600 hover:text-teal-500"
               >
                 {isLogin ? 'Sign up' : 'Log in'}
-              </button>
+              </Link>
             </p>
           </div>
         </div>

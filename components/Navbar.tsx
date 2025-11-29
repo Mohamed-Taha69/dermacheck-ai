@@ -1,25 +1,21 @@
 import React from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ViewState } from '../types';
 import { Menu, X, User as UserIcon, LogOut, Activity, History } from 'lucide-react';
 
-interface NavbarProps {
-  currentView: ViewState;
-  setView: (view: ViewState) => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
+const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const handleNav = (view: ViewState) => {
-    setView(view);
-    setIsOpen(false);
+  const isActive = (path: string) => {
+    return location.pathname === path;
   };
 
   const handleLogout = () => {
     logout();
-    setView('HOME');
+    navigate('/');
     setIsOpen(false);
   };
 
@@ -27,34 +23,34 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
     <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex items-center cursor-pointer" onClick={() => handleNav('HOME')}>
+          <Link to="/" className="flex items-center cursor-pointer">
             <Activity className="h-8 w-8 text-teal-600" />
             <span className="ml-2 text-xl font-bold text-slate-800">DermaCheck</span>
-          </div>
+          </Link>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            <button 
-              onClick={() => handleNav('HOME')}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'HOME' ? 'text-teal-600 bg-teal-50' : 'text-slate-600 hover:text-teal-600'}`}
+            <Link 
+              to="/"
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/') ? 'text-teal-600 bg-teal-50' : 'text-slate-600 hover:text-teal-600'}`}
             >
               Analyzer
-            </button>
+            </Link>
             
             {user ? (
               <>
-                <button 
-                  onClick={() => handleNav('HISTORY')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${currentView === 'HISTORY' ? 'text-teal-600 bg-teal-50' : 'text-slate-600 hover:text-teal-600'}`}
+                <Link 
+                  to="/history"
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${isActive('/history') ? 'text-teal-600 bg-teal-50' : 'text-slate-600 hover:text-teal-600'}`}
                 >
                   <History className="w-4 h-4 mr-1" /> History
-                </button>
-                <button 
-                  onClick={() => handleNav('PROFILE')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${currentView === 'PROFILE' ? 'text-teal-600 bg-teal-50' : 'text-slate-600 hover:text-teal-600'}`}
+                </Link>
+                <Link 
+                  to="/profile"
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${isActive('/profile') ? 'text-teal-600 bg-teal-50' : 'text-slate-600 hover:text-teal-600'}`}
                 >
                   <UserIcon className="w-4 h-4 mr-1" /> Profile
-                </button>
+                </Link>
                 <button 
                   onClick={handleLogout}
                   className="ml-4 px-4 py-2 rounded-md text-sm font-medium text-white bg-slate-800 hover:bg-slate-900 transition-colors flex items-center"
@@ -64,18 +60,18 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
               </>
             ) : (
               <>
-                <button 
-                  onClick={() => handleNav('LOGIN')}
+                <Link 
+                  to="/login"
                   className="px-4 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-teal-600 transition-colors"
                 >
                   Log In
-                </button>
-                <button 
-                  onClick={() => handleNav('REGISTER')}
+                </Link>
+                <Link 
+                  to="/register"
                   className="px-4 py-2 rounded-md text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 transition-colors shadow-sm"
                 >
                   Register
-                </button>
+                </Link>
               </>
             )}
           </div>
@@ -96,26 +92,29 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
       {isOpen && (
         <div className="md:hidden bg-white border-t border-slate-100">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <button 
-              onClick={() => handleNav('HOME')}
+            <Link 
+              to="/"
+              onClick={() => setIsOpen(false)}
               className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-teal-600 hover:bg-teal-50"
             >
               Analyzer
-            </button>
+            </Link>
             {user ? (
               <>
-                 <button 
-                  onClick={() => handleNav('HISTORY')}
+                 <Link 
+                  to="/history"
+                  onClick={() => setIsOpen(false)}
                   className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-teal-600 hover:bg-teal-50"
                 >
                   History
-                </button>
-                <button 
-                  onClick={() => handleNav('PROFILE')}
+                </Link>
+                <Link 
+                  to="/profile"
+                  onClick={() => setIsOpen(false)}
                   className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-teal-600 hover:bg-teal-50"
                 >
                   Profile
-                </button>
+                </Link>
                 <button 
                   onClick={handleLogout}
                   className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
@@ -125,18 +124,20 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
               </>
             ) : (
               <>
-                <button 
-                  onClick={() => handleNav('LOGIN')}
+                <Link 
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
                   className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-teal-600 hover:bg-teal-50"
                 >
                   Log In
-                </button>
-                <button 
-                  onClick={() => handleNav('REGISTER')}
+                </Link>
+                <Link 
+                  to="/register"
+                  onClick={() => setIsOpen(false)}
                   className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-teal-600 font-semibold hover:bg-teal-50"
                 >
                   Register
-                </button>
+                </Link>
               </>
             )}
           </div>
