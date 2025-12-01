@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Routes, Route, Navigate, Link } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Analyzer from './components/Analyzer';
 import ResultCard from './components/ResultCard';
 import AuthForms from './components/AuthForms';
 import Profile from './components/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
+import NotFound from './components/NotFound';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AnalysisResult } from './types';
 
@@ -77,7 +78,7 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       
