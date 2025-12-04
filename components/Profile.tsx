@@ -1,21 +1,21 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Calendar, Trash2, User as UserIcon } from 'lucide-react';
-import { AcneLevel } from '../types';
+import { Calendar, User as UserIcon } from 'lucide-react';
+import { DiseaseType } from '../types';
 
 interface ProfileProps {
   view: 'PROFILE' | 'HISTORY';
 }
 
 const Profile: React.FC<ProfileProps> = ({ view }) => {
-  const { user, history, logout } = useAuth();
+  const { user, history } = useAuth();
 
-  const getLevelBadge = (level: number) => {
-    switch (level) {
-      case 1: return 'bg-green-100 text-green-800';
-      case 2: return 'bg-yellow-100 text-yellow-800';
-      case 3: return 'bg-orange-100 text-orange-800';
-      case 4: return 'bg-red-100 text-red-800';
+  const getDiagnosisBadge = (diagnosis: DiseaseType) => {
+    switch (diagnosis) {
+      case 'Normal': return 'bg-green-100 text-green-800';
+      case 'Chickenpox': return 'bg-yellow-100 text-yellow-800';
+      case 'Measles': return 'bg-orange-100 text-orange-800';
+      case 'Monkeypox': return 'bg-red-100 text-red-800';
       default: return 'bg-slate-100 text-slate-800';
     }
   };
@@ -48,11 +48,17 @@ const Profile: React.FC<ProfileProps> = ({ view }) => {
                 <div className="text-3xl font-bold text-teal-600">{history.length}</div>
                 <div className="text-sm text-slate-500 font-medium">Total Scans</div>
               </div>
-               <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
                 <div className="text-3xl font-bold text-teal-600">
-                   {history.filter(h => h.result.level === 4).length}
+                  {history.filter(h => h.result.diagnosis !== 'Normal').length}
                 </div>
-                <div className="text-sm text-slate-500 font-medium">High Severity Alerts</div>
+                <div className="text-sm text-slate-500 font-medium">Disease Detections</div>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+                <div className="text-3xl font-bold text-red-600">
+                  {history.filter(h => h.result.diagnosis === 'Monkeypox').length}
+                </div>
+                <div className="text-sm text-slate-500 font-medium">Monkeypox Cases</div>
               </div>
             </div>
           </div>
@@ -88,8 +94,8 @@ const Profile: React.FC<ProfileProps> = ({ view }) => {
                     </div>
                   )}
                   <div className="absolute top-2 left-2 md:hidden">
-                     <span className={`px-2 py-1 rounded-md text-xs font-bold ${getLevelBadge(item.result.level)}`}>
-                      Level {item.result.level}
+                    <span className={`px-2 py-1 rounded-md text-xs font-bold ${getDiagnosisBadge(item.result.diagnosis)}`}>
+                      {item.result.diagnosis}
                     </span>
                   </div>
                 </div>
@@ -100,10 +106,10 @@ const Profile: React.FC<ProfileProps> = ({ view }) => {
                       <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
                         {new Date(item.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                       </span>
-                      <h3 className="text-lg font-bold text-slate-800 mt-1">{item.result.levelName}</h3>
+                      <h3 className="text-lg font-bold text-slate-800 mt-1">{item.result.diagnosis}</h3>
                     </div>
-                    <span className={`hidden md:inline-block px-3 py-1 rounded-full text-sm font-bold ${getLevelBadge(item.result.level)}`}>
-                      Level {item.result.level}
+                    <span className={`hidden md:inline-block px-3 py-1 rounded-full text-sm font-bold ${getDiagnosisBadge(item.result.diagnosis)}`}>
+                      {item.result.diagnosis}
                     </span>
                   </div>
                   

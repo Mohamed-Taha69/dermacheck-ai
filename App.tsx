@@ -18,7 +18,7 @@ const HomePage = () => {
     setAnalysisResult(result);
     
     // History is automatically saved by the backend, just refresh it
-    if (user && result.isAcne) {
+    if (user) {
       await refreshHistory();
     }
   };
@@ -39,7 +39,7 @@ const HomePage = () => {
         <div className="max-w-4xl mx-auto bg-teal-900 text-teal-50 rounded-xl p-6 flex flex-col md:flex-row items-center justify-between">
           <div className="mb-4 md:mb-0">
             <h3 className="font-bold text-lg">Save your results?</h3>
-            <p className="text-teal-200 text-sm">Create an account to track your skin progress over time.</p>
+            <p className="text-teal-200 text-sm">Create an account to track your skin disease detection history.</p>
           </div>
           <Link 
             to="/register"
@@ -84,8 +84,8 @@ const AppContent = () => {
       
       <footer className="bg-white border-t border-slate-200 py-8">
         <div className="max-w-7xl mx-auto px-4 text-center text-slate-400 text-sm">
-          <p>&copy; {new Date().getFullYear()} DermaCheck AI. All rights reserved.</p>
-          <p className="mt-2">Disclaimer: This tool provides information based on AI analysis and is not a substitute for professional medical advice, diagnosis, or treatment.</p>
+          <p>&copy; {new Date().getFullYear()} Skin Disease Detection AI. All rights reserved.</p>
+          <p className="mt-2">Disclaimer: This tool provides information based on AI analysis and is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a healthcare provider for accurate diagnosis.</p>
         </div>
       </footer>
     </div>

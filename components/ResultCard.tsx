@@ -1,6 +1,6 @@
 import React from 'react';
-import { AnalysisResult, AcneLevel } from '../types';
-import { AlertTriangle, Check, ChevronRight, Share2, Download } from 'lucide-react';
+import { AnalysisResult, DiseaseType } from '../types';
+import { AlertTriangle, Check, ChevronRight, Activity } from 'lucide-react';
 
 interface ResultCardProps {
   result: AnalysisResult;
@@ -8,58 +8,51 @@ interface ResultCardProps {
 }
 
 const ResultCard: React.FC<ResultCardProps> = ({ result, onReset }) => {
-  const getLevelColor = (level: number) => {
-    switch (level) {
-      case 1: return 'text-green-600 bg-green-50 border-green-200';
-      case 2: return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 3: return 'text-orange-600 bg-orange-50 border-orange-200';
-      case 4: return 'text-red-600 bg-red-50 border-red-200';
+  const getDiagnosisColor = (diagnosis: DiseaseType) => {
+    switch (diagnosis) {
+      case 'Normal': return 'text-green-600 bg-green-50 border-green-200';
+      case 'Chickenpox': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'Measles': return 'text-orange-600 bg-orange-50 border-orange-200';
+      case 'Monkeypox': return 'text-red-600 bg-red-50 border-red-200';
       default: return 'text-slate-600 bg-slate-50 border-slate-200';
     }
   };
 
-  const getLevelBadge = (level: number) => {
-    switch (level) {
-      case 1: return 'bg-green-100 text-green-800';
-      case 2: return 'bg-yellow-100 text-yellow-800';
-      case 3: return 'bg-orange-100 text-orange-800';
-      case 4: return 'bg-red-100 text-red-800';
+  const getDiagnosisBadge = (diagnosis: DiseaseType) => {
+    switch (diagnosis) {
+      case 'Normal': return 'bg-green-100 text-green-800';
+      case 'Chickenpox': return 'bg-yellow-100 text-yellow-800';
+      case 'Measles': return 'bg-orange-100 text-orange-800';
+      case 'Monkeypox': return 'bg-red-100 text-red-800';
       default: return 'bg-slate-100 text-slate-800';
     }
   };
 
-  if (!result.isAcne) {
-    return (
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-3xl mx-auto text-center">
-        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <AlertTriangle className="w-8 h-8 text-slate-400" />
-        </div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">No Acne Detected</h2>
-        <p className="text-slate-600 mb-6">{result.assessment || "The AI could not detect specific acne patterns in this image."}</p>
-        <button 
-          onClick={onReset}
-          className="px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-colors"
-        >
-          Try Another Image
-        </button>
-      </div>
-    );
-  }
+  const getDiagnosisIcon = (diagnosis: DiseaseType) => {
+    if (diagnosis === 'Normal') {
+      return <Check className="w-8 h-8 text-green-600" />;
+    }
+    return <AlertTriangle className="w-8 h-8 text-red-600" />;
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fade-in-up">
-      {/* Header Level Card */}
-      <div className={`rounded-2xl border-2 p-6 md:p-8 ${getLevelColor(result.level)} shadow-sm relative overflow-hidden`}>
+      {/* Header Diagnosis Card */}
+      <div className={`rounded-2xl border-2 p-6 md:p-8 ${getDiagnosisColor(result.diagnosis)} shadow-sm relative overflow-hidden`}>
         <div className="relative z-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div>
-              <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-2 ${getLevelBadge(result.level)}`}>
-                Classification Result
+              <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-2 ${getDiagnosisBadge(result.diagnosis)}`}>
+                Diagnosis Result
               </span>
-              <h1 className="text-3xl font-extrabold mb-1">Level {result.level}</h1>
-              <h2 className="text-xl opacity-90 font-medium">{result.levelName}</h2>
+              <h1 className="text-3xl font-extrabold mb-1">{result.diagnosis}</h1>
+              {result.diagnosis === 'Normal' && (
+                <h2 className="text-xl opacity-90 font-medium">Healthy Skin</h2>
+              )}
             </div>
-            <div className="text-5xl font-black opacity-10">{result.level}</div>
+            <div className="flex items-center justify-center w-16 h-16 bg-white/50 rounded-full">
+              {getDiagnosisIcon(result.diagnosis)}
+            </div>
           </div>
           <p className="text-lg leading-relaxed max-w-2xl font-medium">
             {result.assessment}

@@ -82,30 +82,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           ? JSON.parse(item.medical_advice) 
           : item.medical_advice;
 
-        const gradeToLevel = (grade: string): number => {
-          switch (grade) {
-            case "Mild": return 1;
-            case "Moderate": return 2;
-            case "Severe": return 3;
-            case "Very_Severe": return 4;
-            default: return 1;
+        const validateDiagnosis = (diagnosis: string): 'Monkeypox' | 'Chickenpox' | 'Measles' | 'Normal' => {
+          const validDiagnoses: ('Monkeypox' | 'Chickenpox' | 'Measles' | 'Normal')[] = 
+            ['Monkeypox', 'Chickenpox', 'Measles', 'Normal'];
+          
+          if (validDiagnoses.includes(diagnosis as any)) {
+            return diagnosis as 'Monkeypox' | 'Chickenpox' | 'Measles' | 'Normal';
           }
-        };
-
-        const gradeToLevelName = (grade: string): string => {
-          switch (grade) {
-            case "Mild": return "Mild (Comedonal)";
-            case "Moderate": return "Moderate (Papular/Pustular)";
-            case "Severe": return "Severe (Nodulocystic)";
-            case "Very_Severe": return "Very Severe (Conglobata)";
-            default: return "Mild (Comedonal)";
-          }
+          
+          return 'Normal'; // Default fallback
         };
 
         const result: AnalysisResult = {
-          isAcne: true,
-          level: gradeToLevel(item.acne_grade),
-          levelName: gradeToLevelName(item.acne_grade),
+          diagnosis: validateDiagnosis(item.diagnosis),
           assessment: medicalAdvice.assessment || '',
           keyFeatures: medicalAdvice.key_features || [],
           recommendations: medicalAdvice.recommendations || [],

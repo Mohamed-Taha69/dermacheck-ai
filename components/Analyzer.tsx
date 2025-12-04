@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, RefreshCw, AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { scanImage } from '../services/apiService';
-import { AnalysisResult, AcneLevel } from '../types';
+import { AnalysisResult } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 interface AnalyzerProps {
@@ -85,9 +85,9 @@ const Analyzer: React.FC<AnalyzerProps> = ({ onAnalysisComplete }) => {
     <div className="max-w-3xl mx-auto">
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
         <div className="p-8">
-          <h2 className="text-2xl font-bold text-slate-800 mb-2 text-center">Skin Assessment Tool</h2>
+          <h2 className="text-2xl font-bold text-slate-800 mb-2 text-center">Skin Disease Detection</h2>
           <p className="text-slate-500 text-center mb-8">
-            Upload a clear photo of the affected area for an instant AI-powered analysis.
+            Upload a clear photo of the affected area to detect Monkeypox, Chickenpox, Measles, or Normal skin.
           </p>
 
           {!image ? (

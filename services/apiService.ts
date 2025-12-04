@@ -20,7 +20,7 @@ export const checkBackendConnection = async (): Promise<boolean> => {
 
 export interface ScanResponse {
   status: string;
-  grade: string;
+  diagnosis: string;
   image_url: string;
   report: {
     assessment: string;
@@ -33,7 +33,7 @@ export interface HistoryItemResponse {
   id: string;
   user_id: string;
   image_url: string;
-  acne_grade: string;
+  diagnosis: string;
   confidence: number;
   medical_advice: {
     assessment: string;
@@ -52,26 +52,17 @@ export interface ProfileResponse {
 }
 
 /**
- * Convert backend grade to AnalysisResult format
+ * Validate diagnosis type
  */
-const gradeToLevel = (grade: string): number => {
-  switch (grade) {
-    case "Mild": return 1;
-    case "Moderate": return 2;
-    case "Severe": return 3;
-    case "Very_Severe": return 4;
-    default: return 1;
+const validateDiagnosis = (diagnosis: string): 'Monkeypox' | 'Chickenpox' | 'Measles' | 'Normal' => {
+  const validDiagnoses: ('Monkeypox' | 'Chickenpox' | 'Measles' | 'Normal')[] = 
+    ['Monkeypox', 'Chickenpox', 'Measles', 'Normal'];
+  
+  if (validDiagnoses.includes(diagnosis as any)) {
+    return diagnosis as 'Monkeypox' | 'Chickenpox' | 'Measles' | 'Normal';
   }
-};
-
-const gradeToLevelName = (grade: string): string => {
-  switch (grade) {
-    case "Mild": return "Mild (Comedonal)";
-    case "Moderate": return "Moderate (Papular/Pustular)";
-    case "Severe": return "Severe (Nodulocystic)";
-    case "Very_Severe": return "Very Severe (Conglobata)";
-    default: return "Mild (Comedonal)";
-  }
+  
+  return 'Normal'; // Default fallback
 };
 
 /**
@@ -116,9 +107,7 @@ export const scanImage = async (file: File, userId: string): Promise<{ result: A
 
     // Convert backend response to AnalysisResult format
     const result: AnalysisResult = {
-      isAcne: true, // Backend always returns acne grades
-      level: gradeToLevel(data.grade),
-      levelName: gradeToLevelName(data.grade),
+      diagnosis: validateDiagnosis(data.diagnosis),
       assessment: data.report.assessment,
       keyFeatures: data.report.key_features,
       recommendations: data.report.recommendations,
