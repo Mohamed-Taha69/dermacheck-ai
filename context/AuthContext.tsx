@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { createClient, SupabaseClient, User as SupabaseUser } from '@supabase/supabase-js';
 import { User, HistoryItem, AnalysisResult } from '../types';
-import { getUserHistory, HistoryItemResponse } from '../services/apiService';
+import { getUserHistory, HistoryItemResponse, getUserProfile, ProfileResponse } from '../services/apiService';
 
 interface AuthContextType {
   user: User | null;
@@ -12,6 +12,7 @@ interface AuthContextType {
   history: HistoryItem[];
   addToHistory: (item: HistoryItem) => void;
   refreshHistory: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -62,16 +63,57 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  const loadUserFromSession = async (supabaseUser: SupabaseUser) => {
-    const userData: User = {
-      id: supabaseUser.id,
-      email: supabaseUser.email || '',
-      name: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'User',
+  const loadUserProfile = async (userId: string): Promise<User> => {
+    try {
+      const profile = await getUserProfile(userId);
+      if (profile) {
+        return {
+          id: profile.id,
+          email: profile.email || '',
+          name: profile.full_name || '',
+          age: profile.age || null,
+          gender: profile.gender as 'Male' | 'Female' | null,
+          skin_type: profile.skin_type as any || null,
+          role: profile.role as any || null,
+          phone: profile.phone || null,
+        };
+      }
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+    }
+    
+    // Fallback to basic user data
+    return {
+      id: userId,
+      email: '',
+      name: 'User',
     };
+  };
+
+  const loadUserFromSession = async (supabaseUser: SupabaseUser) => {
+    const userData = await loadUserProfile(supabaseUser.id);
+    // If profile doesn't have name, use metadata
+    if (!userData.name || userData.name === 'User') {
+      userData.name = supabaseUser.user_metadata?.full_name || 
+                      supabaseUser.user_metadata?.name || 
+                      supabaseUser.email?.split('@')[0] || 
+                      'User';
+    }
     setUser(userData);
     localStorage.setItem('dc_user', JSON.stringify(userData));
     await loadHistoryFromBackend(supabaseUser.id);
     setIsLoading(false);
+  };
+
+  const refreshUser = async () => {
+    if (!user?.id) return;
+    try {
+      const updatedUser = await loadUserProfile(user.id);
+      setUser(updatedUser);
+      localStorage.setItem('dc_user', JSON.stringify(updatedUser));
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+    }
   };
 
   const loadHistoryFromBackend = async (userId: string) => {
@@ -254,7 +296,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       isLoading, 
       history, 
       addToHistory,
-      refreshHistory 
+      refreshHistory,
+      refreshUser 
     }}>
       {children}
     </AuthContext.Provider>

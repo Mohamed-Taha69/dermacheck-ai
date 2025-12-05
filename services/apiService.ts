@@ -49,6 +49,11 @@ export interface ProfileResponse {
   username?: string;
   website?: string;
   email?: string;
+  age?: number | null;
+  gender?: 'Male' | 'Female' | null;
+  skin_type?: string | null;
+  role?: string | null;
+  phone?: string | null;
 }
 
 /**
@@ -183,6 +188,11 @@ export const updateUserProfile = async (
     full_name?: string;
     username?: string;
     website?: string;
+    age?: number | null;
+    gender?: 'Male' | 'Female' | null;
+    skin_type?: string | null;
+    role?: string | null;
+    phone?: string | null;
   }
 ): Promise<ProfileResponse> => {
   const response = await fetch(`${API_BASE_URL}/profile/update`, {
