@@ -23,42 +23,7 @@ import {
 } from 'lucide-react';
 
 const HomePage = () => {
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const { user, refreshHistory } = useAuth();
-
-  const handleAnalysisComplete = async (result: AnalysisResult, imageUrl: string) => {
-    setAnalysisResult(result);
-    
-    // History is automatically saved by the backend, just refresh it
-    if (user) {
-      await refreshHistory();
-    }
-    
-    // Scroll to results
-    setTimeout(() => {
-      const resultsElement = document.getElementById('analysis-results');
-      if (resultsElement) {
-        resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
-  };
-
-  const resetAnalysis = () => {
-    setAnalysisResult(null);
-    setTimeout(() => {
-      const analyzerElement = document.getElementById('analyzer-section');
-      if (analyzerElement) {
-        analyzerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
-  };
-
-  const scrollToAnalyzer = () => {
-    const analyzerElement = document.getElementById('analyzer-section');
-    if (analyzerElement) {
-      analyzerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
+  const { user } = useAuth();
 
   return (
     <div className="space-y-0">
@@ -98,21 +63,21 @@ const HomePage = () => {
                     Get Started Free
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
-                  <button
-                    onClick={scrollToAnalyzer}
+                  <Link
+                    to="/analyzer"
                     className="px-8 py-4 bg-white text-teal-700 font-bold rounded-xl shadow-md hover:shadow-lg border-2 border-teal-200 hover:border-teal-300 transition-all transform hover:-translate-y-0.5 flex items-center text-lg"
                   >
                     Try Demo
-                  </button>
+                  </Link>
                 </>
               ) : (
-                <button
-                  onClick={scrollToAnalyzer}
+                <Link
+                  to="/analyzer"
                   className="px-8 py-4 bg-gradient-to-r from-teal-600 to-teal-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:from-teal-700 hover:to-teal-800 transition-all transform hover:-translate-y-0.5 flex items-center text-lg"
                 >
                   Start Analysis
                   <ArrowRight className="ml-2 w-5 h-5" />
-                </button>
+                </Link>
               )}
             </div>
             
@@ -251,47 +216,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Analyzer Section */}
-      <section id="analyzer-section" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
-              Start Your Analysis
-            </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Upload a skin image to get instant AI-powered analysis
-            </p>
-          </div>
-          
-          {analysisResult ? (
-            <div id="analysis-results">
-              <ResultCard result={analysisResult} onReset={resetAnalysis} />
-            </div>
-          ) : (
-            <Analyzer onAnalysisComplete={handleAnalysisComplete} />
-          )}
-          
-          {!user && !analysisResult && (
-            <div className="mt-8 max-w-4xl mx-auto bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-2xl p-8 shadow-xl">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">Save Your Analysis History</h3>
-                  <p className="text-teal-100">
-                    Create a free account to track your skin condition analysis over time and access your complete history.
-                  </p>
-                </div>
-                <Link 
-                  to="/register"
-                  className="px-8 py-3 bg-white text-teal-700 font-bold rounded-xl hover:bg-teal-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 whitespace-nowrap"
-                >
-                  Sign Up Free
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* Stats/Trust Section */}
       <section className="py-16 bg-gradient-to-r from-teal-600 to-teal-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -331,10 +255,10 @@ const HomePage = () => {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
               <Link
-                to="/login"
+                to="/analyzer"
                 className="px-8 py-4 bg-white text-teal-700 font-bold rounded-xl shadow-md hover:shadow-lg border-2 border-teal-200 hover:border-teal-300 transition-all transform hover:-translate-y-0.5 flex items-center justify-center text-lg"
               >
-                Sign In
+                Try Analyzer
               </Link>
             </div>
           </div>
@@ -344,20 +268,95 @@ const HomePage = () => {
   );
 };
 
+const AnalyzerPage = () => {
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const { user, refreshHistory } = useAuth();
+
+  const handleAnalysisComplete = async (result: AnalysisResult, imageUrl: string) => {
+    setAnalysisResult(result);
+    
+    // History is automatically saved by the backend, just refresh it
+    if (user) {
+      await refreshHistory();
+    }
+    
+    // Scroll to results
+    setTimeout(() => {
+      const resultsElement = document.getElementById('analysis-results');
+      if (resultsElement) {
+        resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
+  const resetAnalysis = () => {
+    setAnalysisResult(null);
+    setTimeout(() => {
+      const analyzerElement = document.getElementById('analyzer-section');
+      if (analyzerElement) {
+        analyzerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+          Skin Disease Detection
+        </h1>
+        <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+          Upload a clear photo of the affected area to detect Monkeypox, Chickenpox, Measles, or Normal skin.
+        </p>
+      </div>
+
+      {analysisResult ? (
+        <div id="analysis-results">
+          <ResultCard result={analysisResult} onReset={resetAnalysis} />
+        </div>
+      ) : (
+        <div id="analyzer-section">
+          <Analyzer onAnalysisComplete={handleAnalysisComplete} />
+        </div>
+      )}
+      
+      {!user && !analysisResult && (
+        <div className="max-w-4xl mx-auto bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-2xl p-8 shadow-xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <h3 className="text-2xl font-bold mb-2">Save Your Analysis History</h3>
+              <p className="text-teal-100">
+                Create a free account to track your skin condition analysis over time and access your complete history.
+              </p>
+            </div>
+            <Link 
+              to="/register"
+              className="px-8 py-3 bg-white text-teal-700 font-bold rounded-xl hover:bg-teal-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 whitespace-nowrap"
+            >
+              Sign Up Free
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AppContent = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+      <main className="flex-grow w-full">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<AuthForms initialView="LOGIN" />} />
-          <Route path="/register" element={<AuthForms initialView="REGISTER" />} />
+          <Route path="/analyzer" element={<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><AnalyzerPage /></div>} />
+          <Route path="/login" element={<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><AuthForms initialView="LOGIN" /></div>} />
+          <Route path="/register" element={<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><AuthForms initialView="REGISTER" /></div>} />
           <Route
             path="/profile"
             element={
               <ProtectedRoute>
-                <Profile view="PROFILE" />
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><Profile view="PROFILE" /></div>
               </ProtectedRoute>
             }
           />
@@ -365,11 +364,11 @@ const AppContent = () => {
             path="/history"
             element={
               <ProtectedRoute>
-                <Profile view="HISTORY" />
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><Profile view="HISTORY" /></div>
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><NotFound /></div>} />
         </Routes>
       </main>
       
