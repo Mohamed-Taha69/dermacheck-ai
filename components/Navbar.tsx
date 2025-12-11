@@ -34,12 +34,6 @@ const Navbar: React.FC = () => {
               to="/"
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/') ? 'text-teal-600 bg-teal-50' : 'text-slate-600 hover:text-teal-600'}`}
             >
-              Home
-            </Link>
-            <Link 
-              to="/analyzer"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/analyzer') ? 'text-teal-600 bg-teal-50' : 'text-slate-600 hover:text-teal-600'}`}
-            >
               Analyzer
             </Link>
             
@@ -94,19 +88,12 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-          {/* Mobile Menu */}
+      {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-white border-t border-slate-100">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link 
               to="/"
-              onClick={() => setIsOpen(false)}
-              className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-teal-600 hover:bg-teal-50"
-            >
-              Home
-            </Link>
-            <Link 
-              to="/analyzer"
               onClick={() => setIsOpen(false)}
               className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-teal-600 hover:bg-teal-50"
             >
