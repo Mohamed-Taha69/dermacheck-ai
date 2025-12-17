@@ -1,6 +1,6 @@
 # 🩺 DermaCheck AI
 
-A modern, AI-powered web application for skin condition analysis and acne severity assessment. Built with React, TypeScript, and integrated with a FastAPI backend for medical-grade image analysis.
+A modern, AI-powered web application for skin disease detection and analysis. Built with React, TypeScript, and integrated with a FastAPI backend for medical-grade image analysis. Detect Monkeypox, Chickenpox, Measles, and Normal skin conditions with advanced AI technology.
 
 ![React](https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-3178C6?logo=typescript)
@@ -9,9 +9,10 @@ A modern, AI-powered web application for skin condition analysis and acne severi
 
 ## ✨ Features
 
-- 🔍 **AI-Powered Skin Analysis** - Upload skin images for instant acne severity assessment
-- 📊 **Severity Classification** - Automatic classification into 4 severity levels (Mild, Moderate, Severe, Very Severe)
+- 🔍 **AI-Powered Skin Disease Detection** - Upload skin images for instant detection of Monkeypox, Chickenpox, Measles, and Normal skin conditions
+- 🦠 **Multi-Disease Classification** - Automatic detection and classification of multiple skin diseases
 - 📝 **Medical Reports** - Detailed assessments with key features and personalized recommendations
+- 📊 **Confidence Scores** - Get confidence levels for each diagnosis
 - 👤 **User Authentication** - Secure authentication with Supabase
 - 📈 **History Tracking** - View and track your skin analysis history over time
 - 💾 **Cloud Storage** - Images stored securely in Supabase Storage
@@ -31,7 +32,7 @@ A modern, AI-powered web application for skin condition analysis and acne severi
 ### Backend (Required)
 - **FastAPI** - Python web framework
 - **Supabase** - Database and storage
-- **Gradio Client** - AI model integration (acne detection)
+- **Gradio Client** - AI model integration (skin disease detection)
 
 ## 📋 Prerequisites
 
@@ -107,7 +108,7 @@ The `/scan` endpoint should return:
 ```json
 {
   "status": "success",
-  "grade": "Mild" | "Moderate" | "Severe" | "Very_Severe",
+  "diagnosis": "Monkeypox" | "Chickenpox" | "Measles" | "Normal",
   "image_url": "https://...",
   "report": {
     "assessment": "Detailed assessment text",
@@ -116,6 +117,15 @@ The `/scan` endpoint should return:
   }
 }
 ```
+
+### Supported Diseases
+
+The application can detect the following skin conditions:
+
+- **Monkeypox** - A viral disease that can cause skin lesions
+- **Chickenpox** - A highly contagious viral infection causing itchy blisters
+- **Measles** - A viral infection that can cause skin rashes
+- **Normal** - Healthy skin with no detected conditions
 
 ## 📁 Project Structure
 
@@ -150,7 +160,7 @@ dermacheck-ai/
 - Log in to your account
 - Click "Upload Image" or drag and drop an image
 - Click "Analyze Now" to process the image
-- View detailed results with severity level, assessment, and recommendations
+- View detailed results with disease diagnosis, assessment, key features, and personalized recommendations
 
 ### 3. View History
 - Navigate to "Profile" or "History" from the navbar
@@ -183,6 +193,7 @@ The application uses Supabase Authentication with the following features:
 - Ensure you're logged in (authentication required)
 - Check that the backend is running and accessible
 - Verify Supabase storage is configured in your backend
+- Ensure the image shows a clear view of the affected skin area
 - Check browser console for detailed error messages
 
 ### Images not loading
@@ -243,6 +254,19 @@ For support, please:
 2. Review browser console for error messages
 3. Verify backend and Supabase configurations
 4. Contact the development team
+
+---
+
+## 🦠 Disease Detection Capabilities
+
+DermaCheck AI uses advanced machine learning models to detect and classify skin conditions:
+
+- **Monkeypox Detection** - Identifies characteristic lesions and symptoms
+- **Chickenpox Detection** - Recognizes typical vesicular rash patterns
+- **Measles Detection** - Detects distinctive rash characteristics
+- **Normal Skin Recognition** - Confirms healthy skin appearance
+
+The AI model provides confidence scores and detailed medical assessments to help users understand their skin condition better.
 
 ---
 
